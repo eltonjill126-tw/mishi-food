@@ -1,0 +1,1607 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>覓食 — 找到今天最想吃的那一口</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Noto+Serif+TC:wght@300;400;500;600&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cream:        #F4EFE4;
+      --cream-d:      #EDE5D5;
+      --cream-dd:     #E0D5C0;
+      --rust:         #BF4A20;
+      --rust-l:       #D4603A;
+      --rust-d:       #8B3215;
+      --forest:       #2B4A30;
+      --forest-l:     #3D6645;
+      --brown:        #3D2B1F;
+      --tan:          #C8A882;
+      --tan-l:        #E2D0B5;
+      --white:        #FEFAF5;
+      --text:         #2C1F14;
+      --text-m:       #5C4A38;
+      --text-l:       #9C8A78;
+      --border:       rgba(44,31,20,.12);
+      --sh-sm:        0 2px 8px rgba(44,31,20,.06);
+      --sh:           0 4px 20px rgba(44,31,20,.10);
+      --sh-lg:        0 12px 40px rgba(44,31,20,.14);
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body {
+      font-family:'Noto Sans TC', -apple-system, sans-serif;
+      background:var(--cream);
+      color:var(--text);
+      line-height:1.7;
+      -webkit-font-smoothing:antialiased;
+    }
+    h1,h2,h3 { font-family:'Playfair Display','Noto Serif TC',Georgia,serif; }
+
+    /* ── NAV ── */
+    nav {
+      position:fixed; top:0; left:0; right:0; z-index:200;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 40px;
+      background:rgba(244,239,228,.94);
+      backdrop-filter:blur(14px);
+      border-bottom:1px solid var(--border);
+    }
+    .nav-logo {
+      font-family:'Playfair Display',serif;
+      font-size:22px; font-weight:700;
+      color:var(--rust); text-decoration:none; letter-spacing:-.3px;
+    }
+    .nav-logo span { color:var(--forest); font-style:italic; }
+    .nav-tagline { font-size:12px; color:var(--text-l); letter-spacing:.06em; }
+    .nav-btn {
+      font-size:12px; color:var(--rust); cursor:pointer;
+      background:none; border:1px solid var(--rust);
+      padding:6px 16px; border-radius:20px; transition:all .2s;
+    }
+    .nav-btn:hover { background:var(--rust); color:var(--white); }
+
+    /* ── HERO ── */
+    .hero {
+      min-height:100vh;
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      padding:90px 40px 70px;
+      position:relative; overflow:hidden;
+      background:var(--cream);
+    }
+    /* Decorative SVGs */
+    .deco {
+      position:absolute; pointer-events:none;
+      color:var(--rust);
+    }
+    .deco-1 { top:70px;  left:-30px;  opacity:.07; transform:rotate(-12deg); }
+    .deco-2 { top:80px;  right:-20px; opacity:.07; transform:rotate(8deg); }
+    .deco-3 { bottom:50px; left:20px; opacity:.06; transform:rotate(6deg); }
+    .deco-4 { bottom:60px; right:30px; opacity:.06; transform:rotate(-10deg); }
+    .deco-5 { top:48%; left:3%;  opacity:.04; transform:rotate(15deg); }
+    .deco-6 { top:40%; right:3%; opacity:.04; transform:rotate(-5deg); }
+
+    .hero-eyebrow {
+      font-size:11px; letter-spacing:.22em; text-transform:uppercase;
+      color:var(--rust); margin-bottom:18px;
+      display:flex; align-items:center; gap:12px;
+    }
+    .hero-eyebrow::before,.hero-eyebrow::after {
+      content:''; display:block; width:28px; height:1px; background:var(--rust);
+    }
+    .hero-title {
+      font-size:clamp(52px,9vw,88px);
+      font-weight:700; text-align:center;
+      line-height:1.05; color:var(--text);
+      margin-bottom:18px; letter-spacing:-.02em;
+    }
+    .hero-title .accent { color:var(--rust); font-style:italic; }
+    .hero-sub {
+      font-size:17px; color:var(--text-m); text-align:center;
+      max-width:420px; margin:0 auto 48px;
+      font-weight:300; line-height:1.9;
+    }
+    .cta-btn {
+      display:inline-flex; align-items:center; gap:10px;
+      padding:16px 36px; background:var(--rust); color:var(--white);
+      border:none; border-radius:50px; font-size:16px; cursor:pointer;
+      font-family:'Noto Serif TC',serif; font-weight:500; letter-spacing:.06em;
+      transition:all .25s; text-decoration:none;
+      box-shadow:0 6px 24px rgba(191,74,32,.28);
+    }
+    .cta-btn:hover {
+      background:var(--rust-d);
+      transform:translateY(-2px);
+      box-shadow:0 10px 32px rgba(191,74,32,.36);
+    }
+    .scroll-hint {
+      position:absolute; bottom:28px; left:50%;
+      transform:translateX(-50%);
+      display:flex; flex-direction:column; align-items:center; gap:6px;
+      color:var(--text-l); font-size:11px; letter-spacing:.1em;
+      animation:bob 2.4s ease-in-out infinite;
+    }
+    @keyframes bob {
+      0%,100% { transform:translateX(-50%) translateY(0); }
+      50%      { transform:translateX(-50%) translateY(7px); }
+    }
+
+    /* ── SEARCH BAND ── */
+    .search-band { background:var(--white); }
+    .search-wrap {
+      max-width:880px; margin:0 auto;
+      padding:80px 40px 100px;
+    }
+    .step-label {
+      font-size:10px; letter-spacing:.22em; text-transform:uppercase;
+      color:var(--rust); margin-bottom:10px; font-weight:600;
+    }
+    .step-title {
+      font-size:clamp(26px,3.5vw,36px);
+      font-weight:600; margin-bottom:6px;
+    }
+    .step-desc {
+      font-size:14px; color:var(--text-m);
+      margin-bottom:36px; font-weight:300;
+    }
+    .step-block { margin-bottom:56px; }
+
+    /* mood cards */
+    .mood-grid {
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(178px,1fr));
+      gap:12px;
+    }
+    .mood-card {
+      background:var(--cream);
+      border:1.5px solid var(--border);
+      border-radius:18px; padding:20px 16px;
+      cursor:pointer; transition:all .22s;
+      text-align:left; user-select:none;
+    }
+    .mood-card:hover {
+      border-color:var(--rust);
+      transform:translateY(-2px);
+      box-shadow:var(--sh);
+    }
+    .mood-card.sel {
+      border-color:var(--rust);
+      background:var(--rust); color:var(--white);
+    }
+    .mood-card.sel .mood-name { color:var(--white); }
+    .mood-card.sel .mood-sub  { color:rgba(255,255,255,.72); }
+    .mood-em  { font-size:28px; display:block; margin-bottom:10px; }
+    .mood-name {
+      font-family:'Noto Serif TC',serif;
+      font-size:14px; font-weight:500; color:var(--text);
+      margin-bottom:4px; line-height:1.4;
+    }
+    .mood-sub { font-size:11px; color:var(--text-l); line-height:1.4; }
+
+    /* texture tags */
+    .texture-group { display:flex; flex-wrap:wrap; gap:10px; }
+    .tx-tag {
+      padding:10px 20px; border-radius:50px;
+      border:1.5px solid var(--border);
+      background:var(--cream); cursor:pointer;
+      font-size:14px; color:var(--text-m);
+      transition:all .2s; user-select:none;
+      font-family:'Noto Serif TC',serif;
+    }
+    .tx-tag:hover { border-color:var(--forest); color:var(--forest); }
+    .tx-tag.sel   { background:var(--forest); border-color:var(--forest); color:var(--white); }
+
+    /* ingredient input */
+    .ing-wrap { position:relative; }
+    .ing-input {
+      width:100%; padding:18px 24px;
+      border:1.5px solid var(--border); border-radius:16px;
+      background:var(--cream); font-size:16px;
+      font-family:'Noto Sans TC',sans-serif;
+      color:var(--text); outline:none;
+      transition:border-color .2s, box-shadow .2s;
+    }
+    .ing-input::placeholder { color:var(--text-l); }
+    .ing-input:focus {
+      border-color:var(--rust);
+      box-shadow:0 0 0 4px rgba(191,74,32,.08);
+    }
+    .hint-row {
+      display:flex; flex-wrap:wrap; align-items:center;
+      gap:7px; margin-top:12px;
+    }
+    .hint-label { font-size:11px; color:var(--text-l); }
+    .hint-chip {
+      font-size:11px; padding:4px 12px; border-radius:20px;
+      background:var(--cream-d); color:var(--text-m);
+      cursor:pointer; border:none; transition:all .15s;
+    }
+    .hint-chip:hover { background:var(--tan-l); color:var(--text); }
+
+    /* empty state */
+    .empty-state {
+      text-align:center; padding:60px 20px;
+    }
+    .empty-icon { font-size:52px; margin-bottom:16px; }
+    .empty-title {
+      font-family:'Playfair Display',serif;
+      font-size:22px; color:var(--text); margin-bottom:10px;
+    }
+    .empty-desc { font-size:14px; color:var(--text-l); line-height:1.8; }
+
+    /* free-text inputs under mood & texture */
+    .free-input-row {
+      display: flex; align-items: center; gap: 10px;
+      margin-top: 16px;
+    }
+    .free-input-icon { font-size: 16px; flex-shrink: 0; }
+    .free-input {
+      flex: 1; padding: 12px 18px;
+      border: 1.5px solid var(--border); border-radius: 50px;
+      background: var(--cream); font-size: 14px;
+      font-family: 'Noto Sans TC', sans-serif;
+      color: var(--text); outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .free-input::placeholder { color: var(--text-l); }
+    .free-input:focus {
+      border-color: var(--rust);
+      box-shadow: 0 0 0 3px rgba(191,74,32,.08);
+    }
+    .free-input.has-value {
+      border-color: var(--rust);
+      background: var(--white);
+    }
+
+    /* radius slider */
+    .radius-block {
+      margin-bottom: 56px;
+    }
+    .radius-display {
+      display: flex; align-items: baseline; gap: 10px;
+      margin-bottom: 20px;
+    }
+    .radius-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 44px; font-weight: 700;
+      color: var(--rust); line-height: 1;
+      min-width: 90px;
+    }
+    .radius-unit {
+      font-size: 18px; color: var(--text-m);
+      font-family: 'Noto Serif TC', serif;
+    }
+    .radius-desc {
+      font-size: 13px; color: var(--text-l);
+      margin-left: auto;
+      font-style: italic;
+    }
+    .slider-wrap {
+      position: relative; padding: 6px 0;
+    }
+    .radius-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%; height: 4px;
+      border-radius: 99px;
+      background: var(--cream-dd);
+      outline: none;
+      cursor: pointer;
+      /* filled portion via JS */
+    }
+    .radius-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      background: var(--rust);
+      border: 3px solid var(--white);
+      box-shadow: 0 2px 10px rgba(191,74,32,.35);
+      cursor: grab;
+      transition: transform .15s, box-shadow .15s;
+    }
+    .radius-slider::-webkit-slider-thumb:active {
+      cursor: grabbing;
+      transform: scale(1.15);
+      box-shadow: 0 4px 16px rgba(191,74,32,.45);
+    }
+    .radius-slider::-moz-range-thumb {
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      background: var(--rust);
+      border: 3px solid var(--white);
+      box-shadow: 0 2px 10px rgba(191,74,32,.35);
+      cursor: grab;
+    }
+    .slider-labels {
+      display: flex; justify-content: space-between;
+      margin-top: 10px;
+      font-size: 11px; color: var(--text-l); letter-spacing: .04em;
+    }
+    .slider-tick-row {
+      display: flex; justify-content: space-between;
+      padding: 0 1px; margin-top: 6px;
+    }
+    .slider-tick {
+      width: 1px; height: 6px;
+      background: var(--cream-dd);
+      border-radius: 1px;
+    }
+
+    /* search button */
+    .search-btn {
+      width:100%; padding:20px;
+      background:var(--rust); color:var(--white);
+      border:none; border-radius:16px;
+      font-size:17px; font-family:'Noto Serif TC',serif; font-weight:500;
+      cursor:pointer; transition:all .25s;
+      display:flex; align-items:center; justify-content:center;
+      gap:10px; letter-spacing:.05em;
+      box-shadow:0 6px 24px rgba(191,74,32,.22);
+    }
+    .search-btn:hover {
+      background:var(--rust-d);
+      transform:translateY(-2px);
+      box-shadow:0 10px 32px rgba(191,74,32,.34);
+    }
+    .search-btn:disabled {
+      background:var(--tan); cursor:not-allowed;
+      transform:none; box-shadow:none;
+    }
+
+    /* ── LOADING ── */
+    .loading-band {
+      display:none; text-align:center;
+      padding:100px 40px; background:var(--white);
+    }
+    .loading-band.vis { display:block; }
+    .spinner {
+      width:50px; height:50px;
+      border:3px solid var(--cream-dd);
+      border-top-color:var(--rust);
+      border-radius:50%;
+      animation:spin .75s linear infinite;
+      margin:0 auto 28px;
+    }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .loading-txt {
+      font-family:'Noto Serif TC',serif;
+      font-size:18px; color:var(--text-m); margin-bottom:8px;
+    }
+    .loading-sub { font-size:13px; color:var(--text-l); }
+
+    /* ── RESULTS ── */
+    .results-band {
+      display:none; background:var(--cream);
+      padding:72px 40px 100px;
+    }
+    .results-band.vis { display:block; }
+    .results-inner { max-width:880px; margin:0 auto; }
+
+    .demo-notice {
+      display:none;
+      background:rgba(43,74,48,.07);
+      border:1px solid rgba(43,74,48,.2);
+      border-radius:14px; padding:14px 20px; margin-bottom:32px;
+      font-size:13px; color:var(--forest);
+      align-items:flex-start; gap:12px; line-height:1.7;
+    }
+    .demo-notice.vis { display:flex; }
+    .demo-notice a { color:var(--forest); font-weight:600; }
+
+    .res-header { margin-bottom:48px; padding-bottom:24px; border-bottom:1px solid var(--border); }
+    .res-meta   { font-size:13px; color:var(--text-l); margin-top:6px; }
+
+    /* restaurant card */
+    .r-grid { display:grid; gap:24px; }
+    .r-card {
+      background:var(--white);
+      border-radius:22px; overflow:hidden;
+      box-shadow:var(--sh-sm); border:1px solid var(--border);
+      display:grid; grid-template-columns:1fr 280px;
+      transition:all .3s;
+    }
+    .r-card:hover { transform:translateY(-4px); box-shadow:var(--sh-lg); }
+
+    .r-info { padding:32px 28px; }
+    .r-rank { font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--rust); margin-bottom:8px; font-weight:600; }
+    .r-name {
+      font-family:'Playfair Display','Noto Serif TC',serif;
+      font-size:22px; font-weight:600; color:var(--text);
+      margin-bottom:10px; line-height:1.3;
+    }
+    .r-name a { color:inherit; text-decoration:none; transition:color .2s; }
+    .r-name a:hover { color:var(--rust); }
+
+    .tag-row { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px; }
+    .r-tag {
+      font-size:11px; padding:3px 10px; border-radius:20px;
+      background:var(--cream); color:var(--text-m);
+    }
+    .r-tag.hl { background:rgba(191,74,32,.10); color:var(--rust); }
+
+    .r-addr {
+      font-size:13px; color:var(--text-l); margin-bottom:10px;
+      display:flex; align-items:flex-start; gap:5px; line-height:1.5;
+    }
+    .r-addr svg { flex-shrink:0; margin-top:2px; }
+
+    .r-meta-row {
+      display:flex; align-items:center; flex-wrap:wrap;
+      gap:12px; margin-bottom:18px;
+    }
+    .stars { color:#E8A838; font-size:14px; letter-spacing:1px; }
+    .rating-n { font-weight:600; font-size:14px; }
+    .review-c { font-size:12px; color:var(--text-l); }
+    .dist-badge {
+      display:inline-flex; align-items:center; gap:4px;
+      background:rgba(43,74,48,.09); color:var(--forest);
+      padding:4px 10px; border-radius:20px;
+      font-size:12px; font-weight:500;
+    }
+    .open-badge {
+      display:inline-flex; align-items:center; gap:5px;
+      font-size:12px; font-weight:500;
+    }
+    .open-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+    .open-badge.open  { color:#2B7A3E; } .open-badge.open  .open-dot { background:#2B7A3E; }
+    .open-badge.shut  { color:#C84B35; } .open-badge.shut  .open-dot { background:#C84B35; }
+
+    .r-actions { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px; }
+    .btn-map {
+      display:inline-flex; align-items:center; gap:6px;
+      padding:10px 18px; background:var(--rust); color:var(--white);
+      border-radius:50px; font-size:13px; text-decoration:none;
+      transition:all .2s; font-weight:500;
+    }
+    .btn-map:hover { background:var(--rust-d); transform:translateY(-1px); }
+    .btn-reserve {
+      display:inline-flex; align-items:center; gap:6px;
+      padding:10px 18px; background:transparent; color:var(--forest);
+      border:1.5px solid var(--forest); border-radius:50px;
+      font-size:13px; text-decoration:none;
+      transition:all .2s; font-weight:500;
+    }
+    .btn-reserve:hover { background:var(--forest); color:var(--white); transform:translateY(-1px); }
+    .r-actions { display:flex; flex-wrap:wrap; gap:10px; }
+    .btn-src {
+      display:inline-flex; align-items:center; gap:6px;
+      padding:10px 18px; background:transparent; color:var(--text-m);
+      border-radius:50px; font-size:13px; text-decoration:none;
+      border:1px solid var(--border); transition:all .2s;
+    }
+    .btn-src:hover { border-color:var(--forest); color:var(--forest); }
+
+    .sources-wrap {
+      padding-top:16px; border-top:1px solid var(--border);
+    }
+    .sources-label {
+      font-size:10px; letter-spacing:.12em; text-transform:uppercase;
+      color:var(--text-l); margin-bottom:8px;
+    }
+    .src-links { display:flex; flex-wrap:wrap; gap:7px; }
+    .src-link {
+      display:inline-flex; align-items:center; gap:5px;
+      font-size:12px; color:var(--rust); text-decoration:none;
+      padding:4px 10px; border-radius:6px;
+      background:rgba(191,74,32,.06);
+      border:1px solid rgba(191,74,32,.14);
+      transition:all .15s;
+    }
+    .src-link:hover { background:rgba(191,74,32,.13); }
+
+    /* card visual panel */
+    .r-visual {
+      position:relative; min-height:220px;
+      display:flex; align-items:center; justify-content:center;
+      overflow:hidden;
+    }
+    .r-visual svg { opacity:.22; }
+    .demo-lbl {
+      position:absolute; bottom:0; right:0;
+      background:var(--rust); color:white;
+      font-size:11px; padding:7px 14px;
+      border-radius:14px 0 0 0; letter-spacing:.05em;
+    }
+
+    /* reset btn */
+    .reset-btn {
+      display:inline-flex; align-items:center; gap:8px;
+      margin-top:56px; padding:14px 36px;
+      border:1.5px solid var(--border); border-radius:50px;
+      background:transparent; color:var(--text-m); font-size:15px;
+      cursor:pointer; transition:all .2s;
+    }
+    .reset-btn:hover { border-color:var(--text-m); color:var(--text); }
+
+    /* ── API MODAL ── */
+    .overlay {
+      display:none; position:fixed; inset:0;
+      background:rgba(44,31,20,.48); z-index:500;
+      align-items:center; justify-content:center;
+      backdrop-filter:blur(4px);
+    }
+    .overlay.vis { display:flex; }
+    .modal {
+      background:var(--white); border-radius:24px;
+      padding:40px; max-width:480px; width:92%;
+      box-shadow:var(--sh-lg);
+    }
+    .modal-icon { font-size:38px; margin-bottom:14px; }
+    .modal-title { font-family:'Playfair Display',serif; font-size:24px; margin-bottom:12px; }
+    .modal-desc { font-size:14px; color:var(--text-m); line-height:1.8; margin-bottom:24px; }
+    .modal-desc a { color:var(--rust); }
+    .modal-inp {
+      width:100%; padding:14px 18px;
+      border:1.5px solid var(--border); border-radius:12px;
+      font-size:13px; font-family:monospace; outline:none;
+      margin-bottom:16px; color:var(--text);
+      background:var(--cream); transition:border-color .2s;
+    }
+    .modal-inp:focus { border-color:var(--rust); }
+    .modal-acts { display:flex; gap:10px; }
+    .btn-p {
+      flex:1; padding:13px; background:var(--rust); color:white;
+      border:none; border-radius:12px; font-size:15px; cursor:pointer;
+      transition:background .2s; font-family:'Noto Sans TC',sans-serif;
+    }
+    .btn-p:hover { background:var(--rust-d); }
+    .btn-s {
+      padding:13px 20px; background:transparent; color:var(--text-m);
+      border:1.5px solid var(--border); border-radius:12px; font-size:15px;
+      cursor:pointer; font-family:'Noto Sans TC',sans-serif; transition:all .2s;
+    }
+    .btn-s:hover { border-color:var(--text-m); }
+
+    /* ── TOAST ── */
+    .toast {
+      position:fixed; bottom:32px; left:50%;
+      transform:translateX(-50%) translateY(20px);
+      background:var(--brown); color:white;
+      padding:13px 24px; border-radius:50px; font-size:14px;
+      opacity:0; transition:all .3s; z-index:600; white-space:nowrap;
+      pointer-events:none;
+    }
+    .toast.vis { opacity:1; transform:translateX(-50%) translateY(0); }
+
+    /* ── FOOTER ── */
+    footer {
+      background:var(--forest); color:rgba(255,255,255,.7);
+      padding:64px 40px; text-align:center;
+    }
+    .foot-logo {
+      font-family:'Playfair Display',serif;
+      font-size:36px; color:white; margin-bottom:14px;
+      font-style:italic;
+    }
+    .foot-desc {
+      font-size:14px; max-width:380px; margin:0 auto 32px;
+      line-height:1.9; font-weight:300;
+    }
+    .foot-note { font-size:11px; color:rgba(255,255,255,.36); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width:720px) {
+      nav { padding:12px 20px; }
+      .nav-tagline { display:none; }
+      .search-wrap { padding:56px 20px 72px; }
+      .results-band { padding:56px 20px 72px; }
+      .mood-grid { grid-template-columns:repeat(2,1fr); }
+      .r-card { grid-template-columns:1fr; }
+      .r-visual { min-height:160px; }
+      .hero { padding:90px 24px 64px; }
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(20px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+    .fade-up { opacity:0; animation:fadeUp .5s ease forwards; }
+    .fade-up:nth-child(1) { animation-delay:.05s; }
+    .fade-up:nth-child(2) { animation-delay:.10s; }
+    .fade-up:nth-child(3) { animation-delay:.15s; }
+    .fade-up:nth-child(4) { animation-delay:.20s; }
+    .fade-up:nth-child(5) { animation-delay:.25s; }
+    .fade-up:nth-child(6) { animation-delay:.30s; }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════ NAV ══════════════════════ -->
+<nav>
+  <a href="#" class="nav-logo">覓食 <span>Míshí</span></a>
+  <span class="nav-tagline">找到今天最想吃的那一口</span>
+  <span style="font-size:11px;color:var(--text-l);letter-spacing:.05em;">Powered by OpenStreetMap</span>
+</nav>
+
+<!-- ══════════════════════ HERO ══════════════════════ -->
+<section class="hero">
+
+  <!-- ── Deco SVGs ── -->
+
+  <!-- Ramen bowl -->
+  <div class="deco deco-1">
+    <svg width="220" height="200" viewBox="0 0 220 200" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <ellipse cx="110" cy="145" rx="78" ry="28" stroke-width="3"/>
+      <path d="M32 145 Q110 180 188 145" stroke-width="3"/>
+      <ellipse cx="110" cy="110" rx="78" ry="28" stroke-width="3"/>
+      <path d="M55 108 Q70 96 85 108 Q100 120 115 108 Q130 96 145 108 Q158 118 165 114" stroke-width="2.2"/>
+      <path d="M68 92 Q83 78 98 92 Q113 106 128 92" stroke-width="2.2"/>
+      <circle cx="96" cy="128" r="12" stroke-width="2.5"/>
+      <circle cx="96" cy="128" r="5.5" stroke-width="2"/>
+      <path d="M122 128 Q134 120 140 128 Q146 136 155 130" stroke-width="2"/>
+      <line x1="92" y1="48" x2="106" y2="95" stroke-width="3"/>
+      <line x1="110" y1="44" x2="118" y2="95" stroke-width="3"/>
+    </svg>
+  </div>
+
+  <!-- Cocktail -->
+  <div class="deco deco-2">
+    <svg width="150" height="210" viewBox="0 0 150 210" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20 20 L75 105 L130 20 Z" stroke-width="3"/>
+      <line x1="75" y1="105" x2="75" y2="175" stroke-width="3"/>
+      <ellipse cx="75" cy="175" rx="34" ry="9" stroke-width="2.5"/>
+      <path d="M34 62 Q75 75 116 62" stroke-width="2"/>
+      <circle cx="86" cy="32" r="9" stroke-width="2.2"/>
+      <line x1="86" y1="23" x2="92" y2="14" stroke-width="2"/>
+      <line x1="96" y1="32" x2="118" y2="98" stroke-width="2" stroke-dasharray="4 3"/>
+    </svg>
+  </div>
+
+  <!-- Crab -->
+  <div class="deco deco-3">
+    <svg width="200" height="160" viewBox="0 0 200 160" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <ellipse cx="100" cy="80" rx="38" ry="26" stroke-width="3"/>
+      <!-- left big claw -->
+      <path d="M62 72 Q38 52 22 42" stroke-width="2.5"/>
+      <path d="M22 42 Q10 30 16 24 Q22 18 26 30" stroke-width="2.5"/>
+      <path d="M22 42 Q16 54 22 60" stroke-width="2.5"/>
+      <!-- right big claw -->
+      <path d="M138 72 Q162 52 178 42" stroke-width="2.5"/>
+      <path d="M178 42 Q190 30 184 24 Q178 18 174 30" stroke-width="2.5"/>
+      <path d="M178 42 Q184 54 178 60" stroke-width="2.5"/>
+      <!-- legs L -->
+      <line x1="70" y1="87" x2="44" y2="106" stroke-width="2"/>
+      <line x1="65" y1="93" x2="40" y2="114" stroke-width="2"/>
+      <line x1="62" y1="100" x2="40" y2="122" stroke-width="2"/>
+      <!-- legs R -->
+      <line x1="130" y1="87" x2="156" y2="106" stroke-width="2"/>
+      <line x1="135" y1="93" x2="160" y2="114" stroke-width="2"/>
+      <line x1="138" y1="100" x2="160" y2="122" stroke-width="2"/>
+      <!-- eyes -->
+      <circle cx="84" cy="66" r="5.5" stroke-width="2.2"/>
+      <circle cx="116" cy="66" r="5.5" stroke-width="2.2"/>
+      <!-- body dots -->
+      <circle cx="90" cy="82" r="3" stroke-width="1.5"/>
+      <circle cx="100" cy="84" r="3" stroke-width="1.5"/>
+      <circle cx="110" cy="82" r="3" stroke-width="1.5"/>
+    </svg>
+  </div>
+
+  <!-- Citrus slice -->
+  <div class="deco deco-4">
+    <svg width="150" height="150" viewBox="0 0 150 150" fill="none" stroke="currentColor" stroke-linecap="round">
+      <circle cx="75" cy="75" r="60" stroke-width="3"/>
+      <line x1="75" y1="15" x2="75" y2="135" stroke-width="1.5"/>
+      <line x1="15" y1="75" x2="135" y2="75" stroke-width="1.5"/>
+      <line x1="28" y1="33" x2="122" y2="117" stroke-width="1.5"/>
+      <line x1="122" y1="33" x2="28" y2="117" stroke-width="1.5"/>
+      <circle cx="75" cy="75" r="14" stroke-width="2"/>
+      <path d="M75 15 Q95 42 75 75" stroke-width="1.5"/>
+      <path d="M75 15 Q55 42 75 75" stroke-width="1.5"/>
+      <path d="M135 75 Q108 55 75 75" stroke-width="1.5"/>
+      <path d="M135 75 Q108 95 75 75" stroke-width="1.5"/>
+    </svg>
+  </div>
+
+  <!-- Sushi (small) -->
+  <div class="deco deco-5">
+    <svg width="180" height="90" viewBox="0 0 180 90" fill="none" stroke="currentColor" stroke-linecap="round">
+      <ellipse cx="35" cy="62" rx="22" ry="14" stroke-width="2.5"/>
+      <rect x="14" y="52" width="42" height="10" rx="3" stroke-width="2"/>
+      <ellipse cx="35" cy="48" rx="18" ry="9" stroke-width="2"/>
+      <ellipse cx="90" cy="62" rx="22" ry="14" stroke-width="2.5"/>
+      <rect x="69" y="52" width="42" height="10" rx="3" stroke-width="2"/>
+      <ellipse cx="90" cy="48" rx="18" ry="9" stroke-width="2"/>
+      <ellipse cx="145" cy="62" rx="22" ry="14" stroke-width="2.5"/>
+      <rect x="124" y="52" width="42" height="10" rx="3" stroke-width="2"/>
+      <ellipse cx="145" cy="48" rx="18" ry="9" stroke-width="2"/>
+    </svg>
+  </div>
+
+  <!-- Drink with straw -->
+  <div class="deco deco-6">
+    <svg width="90" height="160" viewBox="0 0 90 160" fill="none" stroke="currentColor" stroke-linecap="round">
+      <path d="M15 30 Q10 100 12 140 Q13 148 45 148 Q77 148 78 140 Q80 100 75 30 Z" stroke-width="2.5"/>
+      <line x1="15" y1="30" x2="75" y2="30" stroke-width="2.5"/>
+      <path d="M15 72 Q45 82 75 72" stroke-width="1.5"/>
+      <circle cx="45" cy="82" r="14" stroke-width="1.5" stroke-dasharray="3 3"/>
+      <line x1="55" y1="25" x2="65" y2="-5" stroke-width="2" stroke-dasharray="5 4"/>
+      <!-- umbrella -->
+      <line x1="65" y1="-5" x2="65" y2="15" stroke-width="1.5"/>
+      <path d="M46 -5 Q65 -20 84 -5" stroke-width="2"/>
+      <line x1="46" y1="-5" x2="65" y2="-5" stroke-width="1.5"/>
+      <line x1="65" y1="-5" x2="84" y2="-5" stroke-width="1.5"/>
+    </svg>
+  </div>
+
+  <div class="hero-eyebrow">用心情找美食</div>
+  <h1 class="hero-title">今天<br>想吃<br><span class="accent">什麼？</span></h1>
+  <p class="hero-sub">不只是搜尋地圖，<br>而是找到最懂你今天心情的那一口</p>
+  <button class="cta-btn" onclick="document.querySelector('.search-band').scrollIntoView({behavior:'smooth'})">
+    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    開始探索
+  </button>
+  <div class="scroll-hint">
+    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
+    往下滑動
+  </div>
+</section>
+
+<!-- ══════════════════════ SEARCH ══════════════════════ -->
+<div class="search-band">
+<div class="search-wrap">
+
+  <!-- Step 1 -->
+  <div class="step-block">
+    <div class="step-label">Step 01 · 心情</div>
+    <h2 class="step-title">你現在的心情？</h2>
+    <p class="step-desc">選一個最接近你狀態的心情，或自己描述也可以</p>
+    <div class="mood-grid" id="moodGrid">
+      <div class="mood-card" data-mood="friday" onclick="pickMood(this)">
+        <span class="mood-em">🎉</span>
+        <div class="mood-name">週五下班<br>週末要來了！</div>
+        <div class="mood-sub">慶祝 · 微醺 · 放鬆</div>
+      </div>
+      <div class="mood-card" data-mood="monday" onclick="pickMood(this)">
+        <span class="mood-em">😮‍💨</span>
+        <div class="mood-name">週一好累<br>需要被療癒</div>
+        <div class="mood-sub">療癒 · 暖胃 · 舒壓</div>
+      </div>
+      <div class="mood-card" data-mood="family" onclick="pickMood(this)">
+        <span class="mood-em">👨‍👩‍👧‍👦</span>
+        <div class="mood-name">週末家人<br>聚餐</div>
+        <div class="mood-sub">合菜 · 豐盛 · 全家適合</div>
+      </div>
+      <div class="mood-card" data-mood="girls" onclick="pickMood(this)">
+        <span class="mood-em">🥂</span>
+        <div class="mood-name">姐妹聚餐<br>想要小酌</div>
+        <div class="mood-sub">餐酒館 · 氣氛 · 話題</div>
+      </div>
+      <div class="mood-card" data-mood="stomach" onclick="pickMood(this)">
+        <span class="mood-em">🌿</span>
+        <div class="mood-name">腸胃不舒服<br>吃清淡一點</div>
+        <div class="mood-sub">清淡 · 暖湯 · 好消化</div>
+      </div>
+      <div class="mood-card" data-mood="brunch" onclick="pickMood(this)">
+        <span class="mood-em">☕</span>
+        <div class="mood-name">假日悠閒<br>早午餐</div>
+        <div class="mood-sub">Brunch · 咖啡 · 慢活</div>
+      </div>
+      <div class="mood-card" data-mood="rainy" onclick="pickMood(this)">
+        <span class="mood-em">🌧️</span>
+        <div class="mood-name">下雨天<br>想吃熱的</div>
+        <div class="mood-sub">火鍋 · 熱湯 · 暖身</div>
+      </div>
+      <div class="mood-card" data-mood="quick" onclick="pickMood(this)">
+        <span class="mood-em">⚡</span>
+        <div class="mood-name">工作日快速<br>午餐</div>
+        <div class="mood-sub">便當 · 定食 · 效率</div>
+      </div>
+    </div>
+    <div class="free-input-row">
+      <span class="free-input-icon">✏️</span>
+      <input class="free-input" id="moodFreeInput" type="text"
+        placeholder="或直接描述你的心情，例如：剛失戀想喝悶酒、跟男友第一次約會..."
+        oninput="onMoodFreeInput(this)" />
+    </div>
+  </div>
+
+  <!-- Step 2 -->
+  <div class="step-block">
+    <div class="step-label">Step 02 · 口感</div>
+    <h2 class="step-title">想要什麼口感？</h2>
+    <p class="step-desc">可以複選，或用自己的話描述</p>
+    <div class="texture-group" id="txGroup">
+      <div class="tx-tag" data-tx="soft"   onclick="pickTx(this)">🧈 軟嫩入口即化</div>
+      <div class="tx-tag" data-tx="mochi"  onclick="pickTx(this)">🍡 QQ 麻糬口感</div>
+      <div class="tx-tag" data-tx="chewy"  onclick="pickTx(this)">💪 有嚼勁彈牙</div>
+      <div class="tx-tag" data-tx="crispy" onclick="pickTx(this)">🔥 酥脆外皮</div>
+      <div class="tx-tag" data-tx="silky"  onclick="pickTx(this)">🌊 滑順如絲</div>
+      <div class="tx-tag" data-tx="fluffy" onclick="pickTx(this)">☁️ 鬆軟蓬鬆</div>
+      <div class="tx-tag" data-tx="creamy" onclick="pickTx(this)">🍦 綿密濃郁</div>
+    </div>
+    <div class="free-input-row">
+      <span class="free-input-icon">✏️</span>
+      <input class="free-input" id="txFreeInput" type="text"
+        placeholder="或自己描述，例如：外皮焦脆內部溏心、帶點微微彈牙的口感..."
+        oninput="onTxFreeInput(this)" />
+    </div>
+  </div>
+
+  <!-- Step 3 -->
+  <div class="step-block">
+    <div class="step-label">Step 03 · 食材 / 料理</div>
+    <h2 class="step-title">有特別想吃什麼？</h2>
+    <p class="step-desc">輸入食材、料理名稱、或任何描述你想吃的東西</p>
+    <div class="ing-wrap">
+      <input class="ing-input" id="ingInput" type="text"
+        placeholder="例：酪梨早午餐、生鮭魚卵丼飯、烤魚下巴、麻辣豆腐..."
+        onkeypress="if(event.key==='Enter')doSearch()"/>
+      <div class="hint-row">
+        <span class="hint-label">熱門：</span>
+        <button class="hint-chip" onclick="fillIng('酪梨早午餐')">酪梨早午餐</button>
+        <button class="hint-chip" onclick="fillIng('生鮭魚卵丼飯')">生鮭魚卵丼</button>
+        <button class="hint-chip" onclick="fillIng('烤魚下巴')">烤魚下巴</button>
+        <button class="hint-chip" onclick="fillIng('雞頸肉')">雞頸肉</button>
+        <button class="hint-chip" onclick="fillIng('松露義大利麵')">松露義大利麵</button>
+        <button class="hint-chip" onclick="fillIng('蟹肉料理')">蟹肉料理</button>
+        <button class="hint-chip" onclick="fillIng('豬腳')">豬腳</button>
+        <button class="hint-chip" onclick="fillIng('抹茶甜點')">抹茶甜點</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 4: Radius -->
+  <div class="step-block radius-block">
+    <div class="step-label">Step 04 · 搜尋範圍</div>
+    <h2 class="step-title">要找多遠的餐廳？</h2>
+    <p class="step-desc">拖動橫桿調整搜尋半徑</p>
+
+    <div class="radius-display">
+      <span class="radius-num" id="radiusNum">2</span>
+      <span class="radius-unit" id="radiusUnit">公里</span>
+      <span class="radius-desc" id="radiusDesc">約步行 25 分鐘</span>
+    </div>
+
+    <div class="slider-wrap">
+      <input
+        type="range"
+        class="radius-slider"
+        id="radiusSlider"
+        min="0" max="5000" step="100"
+        value="2000"
+        oninput="updateRadius(this.value)"
+      />
+      <div class="slider-tick-row">
+        <div class="slider-tick"></div>
+        <div class="slider-tick"></div>
+        <div class="slider-tick"></div>
+        <div class="slider-tick"></div>
+        <div class="slider-tick"></div>
+        <div class="slider-tick"></div>
+        <div class="slider-tick"></div>
+        <div class="slider-tick"></div>
+        <div class="slider-tick"></div>
+        <div class="slider-tick"></div>
+        <div class="slider-tick"></div>
+      </div>
+      <div class="slider-labels">
+        <span>0 m</span>
+        <span>500 m</span>
+        <span>1 km</span>
+        <span>1.5 km</span>
+        <span>2 km</span>
+        <span>2.5 km</span>
+        <span>3 km</span>
+        <span>3.5 km</span>
+        <span>4 km</span>
+        <span>4.5 km</span>
+        <span>5 km</span>
+      </div>
+    </div>
+  </div>
+
+  <button class="search-btn" id="searchBtn" onclick="doSearch()">
+    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+      <circle cx="12" cy="10" r="3"/>
+    </svg>
+    搜尋我附近 2 公里內的餐廳
+  </button>
+
+</div>
+</div>
+
+<!-- ══════════════════════ LOADING ══════════════════════ -->
+<div class="loading-band" id="loadingBand">
+  <div class="spinner"></div>
+  <div class="loading-txt" id="loadTxt">正在取得你的位置...</div>
+  <div class="loading-sub">透過 OpenStreetMap 搜尋附近餐廳中…</div>
+</div>
+
+<!-- ══════════════════════ RESULTS ══════════════════════ -->
+<div class="results-band" id="resultsBand">
+<div class="results-inner">
+
+  <div class="demo-notice" id="demoNotice">
+    <span style="font-size:20px;flex-shrink:0">🔬</span>
+    <span>
+      目前為<strong>示範模式</strong>，顯示範例資料。請確認已開啟瀏覽器定位權限，即可搜尋真實附近餐廳。
+    </span>
+  </div>
+
+  <div class="res-header">
+    <div class="step-label">搜尋結果</div>
+    <h2 class="step-title" id="resTitle">為你找到的餐廳</h2>
+    <p class="res-meta" id="resMeta"></p>
+  </div>
+
+  <div class="r-grid" id="rGrid"></div>
+
+  <!-- empty / error state -->
+  <div class="empty-state" id="emptyState" style="display:none">
+    <div class="empty-icon">🍽️</div>
+    <h3 class="empty-title">附近找不到餐廳</h3>
+    <p class="empty-desc" id="emptyDesc">在你設定的範圍內找不到符合的結果。</p>
+    <button class="cta-btn" style="margin-top:24px;font-size:14px;padding:12px 28px" onclick="retryWider()">
+      放大搜尋範圍再試一次
+    </button>
+  </div>
+
+  <div style="text-align:center">
+    <button class="reset-btn" onclick="resetAll()">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M1 4v6h6"/><path d="M23 20v-6h-6"/>
+        <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15"/>
+      </svg>
+      重新搜尋
+    </button>
+  </div>
+
+</div>
+</div>
+
+<!-- ══════════════════════ FOOTER ══════════════════════ -->
+<footer>
+  <div class="foot-logo">覓食</div>
+  <p class="foot-desc">不只是找餐廳，<br>而是找到今天最想要的那一口。</p>
+  <p class="foot-note">資料來源：OpenStreetMap · Google Maps 導航 · 公開評論與部落格文章</p>
+</footer>
+
+<!-- ══════════════════════ MODAL ══════════════════════ -->
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-icon">🔑</div>
+    <h3 class="modal-title">設定 Foursquare API Key</h3>
+    <p class="modal-desc">
+      使用 Foursquare Places API 搜尋附近真實餐廳。<br>
+      你的 Key 只存在瀏覽器本地，不會傳送至任何伺服器。<br><br>
+      前往 <a href="https://developer.foursquare.com/" target="_blank" rel="noopener">Foursquare Developer</a> 免費申請，
+      每月有 100,000 次免費呼叫額度。
+    </p>
+    <input class="modal-inp" id="keyInp" type="text" placeholder="FSQ..."/>
+    <div class="modal-acts">
+      <button class="btn-s" onclick="closeModal()">取消</button>
+      <button class="btn-p" onclick="saveKey()">儲存並使用</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ══════════════════════ SCRIPT ══════════════════════ -->
+<script>
+/* ── state ── */
+let mood = null;
+let txs = [];
+let loc  = null;
+let radius = 2000;
+let apiKey = localStorage.getItem('mishi_fsq_key') || 'fsq3v/iptgAfbhEFaYBH0uFa6rQL0JIOKjiDczRlHwwllcg=';
+// persist default key on first load
+if (!localStorage.getItem('mishi_fsq_key')) {
+  localStorage.setItem('mishi_fsq_key', apiKey);
+}
+
+/* ── radius slider ── */
+function updateRadius(val) {
+  radius = parseInt(val);
+  const slider = document.getElementById('radiusSlider');
+  const pct = (radius / 5000) * 100;
+  slider.style.background =
+    `linear-gradient(to right, var(--rust) ${pct}%, var(--cream-dd) ${pct}%)`;
+
+  const numEl  = document.getElementById('radiusNum');
+  const unitEl = document.getElementById('radiusUnit');
+  const desc   = document.getElementById('radiusDesc');
+
+  if (radius < 1000) {
+    numEl.textContent  = radius;
+    unitEl.textContent = '公尺';
+  } else {
+    numEl.textContent  = (radius / 1000).toFixed(radius % 1000 === 0 ? 0 : 1);
+    unitEl.textContent = '公里';
+  }
+
+  const mins = Math.round(radius / 80);
+  if (radius === 0) {
+    desc.textContent = '請拖動橫桿設定範圍';
+  } else if (mins <= 1) {
+    desc.textContent = '步行不到 1 分鐘';
+  } else if (mins <= 60) {
+    desc.textContent = `約步行 ${mins} 分鐘`;
+  } else {
+    desc.textContent = '搜尋範圍很廣';
+  }
+}
+
+// initialise slider fill on load
+document.addEventListener('DOMContentLoaded', () => updateRadius(2000));
+
+/* ── maps ── */
+const MOOD = {
+  friday:  { q:'居酒屋 熱炒 串燒 餐酒館',       lbl:'週五慶祝',  icon:'🎉', t:'bar',        kw:'居酒屋|熱炒|串燒|餐酒館|燒烤|酒場|izakaya' },
+  monday:  { q:'拉麵 火鍋 湯麵 療癒美食',        lbl:'週一療癒',  icon:'😮‍💨', t:'restaurant', kw:'拉麵|火鍋|湯麵|麵屋|涮涮|豚骨|牛肉麵' },
+  family:  { q:'合菜 海鮮 家庭餐廳 熱炒',        lbl:'家人聚餐',  icon:'👨‍👩‍👧‍👦', t:'restaurant', kw:'合菜|海鮮|熱炒|台菜|家庭|食堂|大餐廳' },
+  girls:   { q:'餐酒館 義式 法式 小酒館',         lbl:'姐妹小酌',  icon:'🥂', t:'bar',        kw:'餐酒館|義式|法式|bistro|wine|酒館|bar|pasta' },
+  stomach: { q:'清粥 稀飯 湯品 清淡養生 蔬食',    lbl:'清淡養胃',  icon:'🌿', t:'restaurant', kw:'粥|稀飯|蔬食|素食|養生|清淡|湯品|豆腐|蒸|清蒸' },
+  brunch:  { q:'早午餐 brunch 咖啡廳 café',       lbl:'假日早午餐',icon:'☕', t:'cafe',       kw:'早午餐|brunch|咖啡|café|cafe|早餐|鬆餅|吐司' },
+  rainy:   { q:'火鍋 涮涮鍋 湯鍋 關東煮',        lbl:'暖身熱食',  icon:'🌧️', t:'restaurant', kw:'火鍋|涮涮|湯鍋|關東煮|麻辣鍋|鍋物|燉湯|熱湯' },
+  quick:   { q:'便當 定食 自助餐 快餐',           lbl:'快速午餐',  icon:'⚡', t:'restaurant', kw:'便當|定食|自助餐|快餐|飯糰|小吃|滷肉|雞腿飯' },
+};
+const TX = {
+  soft:   '軟嫩 燉肉 控肉',
+  mochi:  'QQ 麻糬 彈牙 芋圓',
+  chewy:  '嚼勁 牛肉 粗麵',
+  crispy: '酥炸 酥脆 外酥',
+  silky:  '滑順 豆腐 茶碗蒸',
+  fluffy: '鬆軟 麵包 鬆餅',
+  creamy: '綿密 濃湯 起司 奶油',
+};
+
+/* ── interactions ── */
+function pickMood(el) {
+  document.querySelectorAll('.mood-card').forEach(c => c.classList.remove('sel'));
+  el.classList.add('sel');
+  mood = el.dataset.mood;
+  // clear free text when a card is chosen
+  const fi = document.getElementById('moodFreeInput');
+  fi.value = ''; fi.classList.remove('has-value');
+}
+function onMoodFreeInput(el) {
+  el.classList.toggle('has-value', el.value.trim().length > 0);
+  if (el.value.trim()) {
+    // deselect cards when typing freely
+    document.querySelectorAll('.mood-card').forEach(c => c.classList.remove('sel'));
+    mood = null;
+  }
+}
+function pickTx(el) {
+  el.classList.toggle('sel');
+  const t = el.dataset.tx;
+  txs = el.classList.contains('sel')
+    ? [...txs, t]
+    : txs.filter(x => x !== t);
+  // clear free text when tags are chosen
+  if (txs.length) {
+    const fi = document.getElementById('txFreeInput');
+    fi.value = ''; fi.classList.remove('has-value');
+  }
+}
+function onTxFreeInput(el) {
+  el.classList.toggle('has-value', el.value.trim().length > 0);
+  if (el.value.trim()) {
+    // deselect tags when typing freely
+    document.querySelectorAll('.tx-tag').forEach(t => t.classList.remove('sel'));
+    txs = [];
+  }
+}
+function fillIng(v) { document.getElementById('ingInput').value = v; }
+
+/* ── search ── */
+function getMoodFree() { return document.getElementById('moodFreeInput').value.trim(); }
+function getTxFree()   { return document.getElementById('txFreeInput').value.trim(); }
+
+function buildQ() {
+  const parts = [];
+  if (mood && MOOD[mood]) parts.push(MOOD[mood].q);
+  else if (getMoodFree()) parts.push(getMoodFree());
+  txs.forEach(t => TX[t] && parts.push(TX[t]));
+  if (getTxFree()) parts.push(getTxFree());
+  const v = document.getElementById('ingInput').value.trim();
+  if (v) parts.push(v);
+  if (!parts.length) parts.push('餐廳');
+  return parts.join(' ').slice(0, 100);
+}
+
+async function doSearch() {
+  const v        = document.getElementById('ingInput').value.trim();
+  const moodFree = getMoodFree();
+  const txFree   = getTxFree();
+  if (!mood && !moodFree && !txs.length && !txFree && !v) {
+    toast('請選擇或描述心情、口感，或輸入想吃的食物'); return;
+  }
+
+  setLoading(true, '正在取得你的位置…');
+
+  try {
+    loc = await getGeo();
+  } catch(_) {
+    setLoading(false);
+    showEmptyState('無法取得你的位置。\n請確認手機／瀏覽器已開啟定位權限，然後重新搜尋。');
+    return;
+  }
+
+  setLoadTxt('正在搜尋附近美食…');
+
+  try {
+    await searchApify();
+  } catch(e) {
+    console.warn('Search error:', e);
+    setLoading(false);
+    showEmptyState('搜尋時發生問題，請稍後再試。');
+  }
+}
+
+function showEmptyState(msg) {
+  setLoading(false);
+  document.getElementById('emptyDesc').textContent = (msg || '在你設定的範圍內找不到符合的結果。').replace(/\\n/g, '\n');
+  document.getElementById('emptyState').style.display = 'block';
+  document.getElementById('resTitle').textContent = '';
+  document.getElementById('resMeta').textContent = '';
+  document.getElementById('rGrid').innerHTML = '';
+  const band = document.getElementById('resultsBand');
+  band.classList.add('vis');
+  setTimeout(() => band.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+}
+
+function retryWider() {
+  const slider = document.getElementById('radiusSlider');
+  const newVal = Math.min(parseInt(slider.value) * 2 || 4000, 5000);
+  slider.value = newVal;
+  updateRadius(newVal);
+  document.getElementById('emptyState').style.display = 'none';
+  doSearch();
+}
+
+function getGeo() {
+  return new Promise((ok, fail) => {
+    if (!navigator.geolocation) return fail();
+    navigator.geolocation.getCurrentPosition(
+      p => ok({ lat: p.coords.latitude, lng: p.coords.longitude }),
+      fail, { timeout:10000, enableHighAccuracy:true }
+    );
+  });
+}
+
+/* ── Apify Google Maps search ── */
+function buildApifyQuery() {
+  const parts = [];
+  const ing      = document.getElementById('ingInput').value.trim();
+  const moodFree = getMoodFree();
+  const txFree   = getTxFree();
+  if (ing)            parts.push(ing);
+  if (moodFree)       parts.push(moodFree);
+  else if (mood && MOOD[mood]) parts.push(MOOD[mood].q.split(' ').slice(0, 2).join(' '));
+  if (txFree)         parts.push(txFree);
+  else txs.forEach(t => TX[t] && parts.push(TX[t].split(' ')[0]));
+  if (!parts.length)  parts.push('餐廳');
+  return parts.join(' ').slice(0, 80);
+}
+
+const loadingMsgs = [
+  '正在翻遍 Google 地圖…',
+  '掃描附近的好餐廳…',
+  '比對評論跟食記中…',
+  '快好了，再等一下…',
+];
+
+async function searchApify() {
+  const query = buildApifyQuery();
+
+  // Start Apify run
+  const startRes = await fetch('/api/apify-start', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query, lat: loc.lat, lng: loc.lng, radius }),
+  });
+  if (!startRes.ok) throw new Error('無法啟動搜尋');
+  const { runId } = await startRes.json();
+
+  // Poll for completion (max 90s)
+  let msgIdx = 0;
+  for (let i = 0; i < 30; i++) {
+    await pause(3000);
+    setLoadTxt(loadingMsgs[msgIdx++ % loadingMsgs.length]);
+
+    const statusRes = await fetch(`/api/apify-status?runId=${runId}`);
+    const { status } = await statusRes.json();
+
+    if (status === 'SUCCEEDED') {
+      const items = await fetch(`/api/apify-results?runId=${runId}`).then(r => r.json());
+      const places = (Array.isArray(items) ? items : [])
+        .filter(p => p.title)
+        .map(p => convertApify(p));
+
+      if (places.length) { showResults(places, false); return; }
+
+      // Got results but none matched — show Oops with fallback query
+      setLoadTxt('找不到完全符合的，搜尋附近人氣餐廳…');
+      const fallback = await fetch('/api/apify-start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: '餐廳 推薦', lat: loc.lat, lng: loc.lng, radius: Math.max(radius, 2000) }),
+      }).then(r => r.json());
+
+      for (let j = 0; j < 20; j++) {
+        await pause(3000);
+        const s2 = await fetch(`/api/apify-status?runId=${fallback.runId}`).then(r => r.json());
+        if (s2.status === 'SUCCEEDED') {
+          const fb = await fetch(`/api/apify-results?runId=${fallback.runId}`).then(r => r.json());
+          const fbPlaces = (Array.isArray(fb) ? fb : []).filter(p => p.title).map(p => convertApify(p));
+          if (fbPlaces.length) { showResults(fbPlaces, false, true); return; }
+          break;
+        }
+        if (s2.status === 'FAILED') break;
+      }
+
+      showEmptyState('附近暫時找不到符合的餐廳，試試調整搜尋條件或擴大範圍。');
+      return;
+    }
+
+    if (status === 'FAILED') throw new Error('搜尋失敗，請再試一次。');
+  }
+
+  throw new Error('搜尋逾時，請再試一次。');
+}
+
+function convertApify(p) {
+  const name    = p.title || '未命名';
+  const addr    = p.address || p.street || '';
+  const lat     = p.location?.lat ?? p.lat;
+  const lng     = p.location?.lng ?? p.lng;
+  const dist    = (lat && lng) ? haversine(loc.lat, loc.lng, lat, lng) : null;
+  const mapsUrl = p.url || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name + ' ' + addr)}`;
+  return {
+    name, addr,
+    rating: p.totalScore ?? null,
+    cnt:    p.reviewsCount ?? 0,
+    dist, isOpen: null, mapsUrl,
+    reserveUrl: p.reserveTableUrl || null,
+    category: (p.categories || []).slice(0, 2).join('、'),
+    tags: buildTags(), sources: makeSources(name),
+  };
+}
+
+function convertOSM(e, dist) {
+  const t    = e.tags || {};
+  const name = t.name || t['name:zh'] || t['name:en'] || '未命名';
+  const addr = [t['addr:street'], t['addr:housenumber'], t['addr:city']]
+    .filter(Boolean).join(' ') || '';
+  const mapsUrl  = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name + (addr?' '+addr:''))}`;
+  return {
+    name, addr, rating: null, cnt: 0, dist,
+    isOpen: null,
+    mapsUrl, category: cuisine || t.amenity || '',
+    tags: buildTags(),
+    sources: makeSources(name),
+  };
+}
+
+function haversine(la1, lo1, la2, lo2) {
+  const R = 6371000, r = Math.PI/180;
+  const dLa = (la2-la1)*r, dLo = (lo2-lo1)*r;
+  const a = Math.sin(dLa/2)**2 + Math.cos(la1*r)*Math.cos(la2*r)*Math.sin(dLo/2)**2;
+  return Math.round(R * 2*Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
+}
+
+
+function buildTags() {
+  const out = [];
+  if (mood && MOOD[mood]) out.push({ lbl: MOOD[mood].lbl, hl: true });
+  else if (getMoodFree()) out.push({ lbl: getMoodFree(), hl: true });
+  txs.slice(0,2).forEach(t => {
+    const m = { soft:'軟嫩', mochi:'QQ口感', chewy:'嚼勁', crispy:'酥脆', silky:'滑順', fluffy:'鬆軟', creamy:'綿密' };
+    out.push({ lbl: m[t]||t, hl:false });
+  });
+  if (getTxFree()) out.push({ lbl: getTxFree(), hl: false });
+  const v = document.getElementById('ingInput').value.trim();
+  if (v) out.push({ lbl: v, hl:true });
+  return out;
+}
+
+function makeSources(name) {
+  const e = encodeURIComponent(name);
+  return [
+    { icon:'🔍', lbl:'Google 評論', url:`https://www.google.com/search?q=${e}+評論+餐廳` },
+    { icon:'📝', lbl:'食記 Blog',   url:`https://www.google.com/search?q=${e}+食記+blog+推薦` },
+    { icon:'📸', lbl:'Instagram',   url:`https://www.instagram.com/explore/search/keyword/?q=${e}` },
+    { icon:'🧵', lbl:'Threads',     url:`https://www.threads.net/search?q=${e}` },
+  ];
+}
+
+/* ── demo data ── */
+const DEMOS = [
+  {
+    name:'京都炭火燒鳥 居酒屋',
+    addr:'台北市大安區仁愛路四段XX號',
+    rating:4.7, cnt:842, dist:340, isOpen:true,
+    mapsUrl:'https://www.google.com/maps/search/居酒屋+台北',
+    colorIdx:0,
+    sources:[
+      { icon:'🔍', lbl:'Google 評論', url:'https://www.google.com/search?q=燒鳥居酒屋+台北+評論' },
+      { icon:'📝', lbl:'食記 Blog',   url:'https://www.google.com/search?q=燒鳥居酒屋+台北+食記' },
+      { icon:'📸', lbl:'Instagram',   url:'https://www.google.com/search?q=燒鳥+site:instagram.com' },
+    ],
+  },
+  {
+    name:'麵屋山田 濃厚豚骨拉麵',
+    addr:'台北市中山區南京西路XX號',
+    rating:4.5, cnt:1203, dist:720, isOpen:true,
+    mapsUrl:'https://www.google.com/maps/search/拉麵+台北',
+    colorIdx:1,
+    sources:[
+      { icon:'🔍', lbl:'Google 評論', url:'https://www.google.com/search?q=豚骨拉麵+台北+評論' },
+      { icon:'📝', lbl:'食記 Blog',   url:'https://www.google.com/search?q=豚骨拉麵+台北+食記' },
+      { icon:'📸', lbl:'Instagram',   url:'https://www.google.com/search?q=拉麵台北+site:instagram.com' },
+      { icon:'🧵', lbl:'Threads',     url:'https://www.threads.net/search?q=拉麵推薦' },
+    ],
+  },
+  {
+    name:'橘子餐酒館 Bistro',
+    addr:'台北市信義區松高路XX號',
+    rating:4.4, cnt:567, dist:1150, isOpen:false,
+    mapsUrl:'https://www.google.com/maps/search/餐酒館+台北信義',
+    colorIdx:2,
+    sources:[
+      { icon:'🔍', lbl:'Google 評論', url:'https://www.google.com/search?q=台北餐酒館+評論' },
+      { icon:'📸', lbl:'Instagram',   url:'https://www.google.com/search?q=台北餐酒館+site:instagram.com' },
+      { icon:'🧵', lbl:'Threads',     url:'https://www.threads.net/search?q=台北餐酒館推薦' },
+    ],
+  },
+  {
+    name:'早安咖啡 · Brunch & More',
+    addr:'台北市松山區民生東路XX號',
+    rating:4.6, cnt:398, dist:890, isOpen:true,
+    mapsUrl:'https://www.google.com/maps/search/早午餐+台北',
+    colorIdx:3,
+    sources:[
+      { icon:'🔍', lbl:'Google 評論', url:'https://www.google.com/search?q=台北早午餐+評論' },
+      { icon:'📝', lbl:'食記 Blog',   url:'https://www.google.com/search?q=台北早午餐+food+blog' },
+      { icon:'📸', lbl:'Instagram',   url:'https://www.google.com/search?q=台北早午餐+site:instagram.com' },
+    ],
+  },
+];
+
+function showDemo() {
+  const mData = mood ? MOOD[mood] : null;
+  const ing = document.getElementById('ingInput').value.trim();
+  const demos = DEMOS.map(d => ({
+    ...d,
+    tags: [
+      ...(mData ? [{ lbl: mData.lbl, hl:true }] : []),
+      ...(ing ? [{ lbl: ing, hl:true }] : []),
+      { lbl:'示範資料', hl:false },
+    ],
+  }));
+  showResults(demos, true);
+}
+
+/* ── render results ── */
+const COLORS = [
+  { bg:'#FFF3EE', color:'#BF4A20' },
+  { bg:'#EDF5EE', color:'#2B4A30' },
+  { bg:'#F5F0FA', color:'#6B3A7A' },
+  { bg:'#FFF9EE', color:'#8B6020' },
+];
+const ILLU = [
+  /* ramen */
+  `<svg width="130" height="130" viewBox="0 0 130 130" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2">
+    <ellipse cx="65" cy="95" rx="50" ry="18"/>
+    <path d="M15 95 Q65 118 115 95"/>
+    <ellipse cx="65" cy="72" rx="50" ry="18"/>
+    <path d="M32 70 Q43 59 54 70 Q65 81 76 70 Q87 59 98 70"/>
+    <circle cx="56" cy="84" r="8"/>
+    <circle cx="56" cy="84" r="4"/>
+    <path d="M75 84 Q82 78 90 84"/>
+    <line x1="56" y1="30" x2="63" y2="62"/>
+    <line x1="68" y1="28" x2="74" y2="62"/>
+  </svg>`,
+  /* burger */
+  `<svg width="130" height="110" viewBox="0 0 130 110" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2">
+    <path d="M20 42 Q65 18 110 42" />
+    <rect x="18" y="42" width="94" height="12" rx="4"/>
+    <rect x="14" y="54" width="102" height="10" rx="3"/>
+    <rect x="18" y="64" width="94" height="10" rx="3"/>
+    <path d="M14 74 Q20 90 65 92 Q110 90 116 74 Z"/>
+    <path d="M25 54 Q45 50 65 54 Q85 58 105 54" stroke-dasharray="3 3"/>
+  </svg>`,
+  /* cocktail glass */
+  `<svg width="100" height="140" viewBox="0 0 100 140" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2">
+    <path d="M12 14 L50 72 L88 14 Z"/>
+    <line x1="50" y1="72" x2="50" y2="118"/>
+    <ellipse cx="50" cy="118" rx="24" ry="7"/>
+    <path d="M22 42 Q50 52 78 42"/>
+    <circle cx="58" cy="22" r="6"/>
+    <line x1="58" y1="16" x2="63" y2="8"/>
+    <line x1="63" y1="22" x2="80" y2="68" stroke-dasharray="4 3"/>
+  </svg>`,
+  /* sushi */
+  `<svg width="150" height="80" viewBox="0 0 150 80" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2">
+    <ellipse cx="28" cy="55" rx="19" ry="12"/>
+    <rect x="10" y="44" width="36" height="11" rx="3"/>
+    <ellipse cx="28" cy="41" rx="15" ry="8"/>
+    <ellipse cx="75" cy="55" rx="19" ry="12"/>
+    <rect x="57" y="44" width="36" height="11" rx="3"/>
+    <ellipse cx="75" cy="41" rx="15" ry="8"/>
+    <ellipse cx="122" cy="55" rx="19" ry="12"/>
+    <rect x="104" y="44" width="36" height="11" rx="3"/>
+    <ellipse cx="122" cy="41" rx="15" ry="8"/>
+    <path d="M52 70 Q75 78 98 70"/>
+    <ellipse cx="75" cy="70" rx="12" ry="4"/>
+  </svg>`,
+];
+
+function showResults(list, isDemo, isFallback) {
+  setLoading(false);
+  document.getElementById('emptyState').style.display = 'none';
+
+  const mData = mood ? MOOD[mood] : null;
+  const ing   = document.getElementById('ingInput').value.trim();
+
+  if (isFallback) {
+    document.getElementById('resTitle').innerHTML =
+      `<span style="font-size:1.1em">Oops！</span> 沒有完全符合你心願的餐廳`;
+    document.getElementById('resMeta').textContent =
+      '不過附近有這些超多人推薦的好去處 👇';
+  } else {
+    const titleParts = [];
+    if (mData) titleParts.push(mData.icon + ' ' + mData.lbl);
+    if (ing)   titleParts.push(ing);
+    document.getElementById('resTitle').textContent =
+      titleParts.length ? `為「${titleParts.join(' · ')}」找到的餐廳` : '附近的餐廳';
+  }
+
+  const rLabel = radius < 1000 ? `${radius} 公尺` : `${(radius/1000).toFixed(radius%1000===0?0:1)} 公里`;
+  if (!isFallback) {
+    document.getElementById('resMeta').textContent =
+      `共找到 ${list.length} 間符合條件的餐廳 · 範圍：${rLabel} 以內`;
+  }
+
+  const notice = document.getElementById('demoNotice');
+  notice.classList.toggle('vis', isDemo);
+
+  const grid = document.getElementById('rGrid');
+  grid.innerHTML = '';
+
+  list.forEach((p, i) => {
+    const ci = typeof p.colorIdx === 'number' ? p.colorIdx : i % COLORS.length;
+    const col = COLORS[ci];
+    const illIdx = i % ILLU.length;
+    const tags = p.tags || buildTags();
+
+    const el = document.createElement('div');
+    el.className = 'r-card fade-up';
+    el.innerHTML = `
+      <div class="r-info">
+        <div class="r-rank"># ${i+1} 推薦</div>
+        <h3 class="r-name"><a href="${esc(p.mapsUrl)}" target="_blank" rel="noopener">${esc(p.name)}</a></h3>
+
+        <div class="tag-row">
+          ${tags.map(t=>`<span class="r-tag${t.hl?' hl':''}">${esc(t.lbl)}</span>`).join('')}
+        </div>
+
+        ${p.rating ? `
+        <div class="r-meta-row">
+          <span class="stars">${stars(p.rating)}</span>
+          <span class="rating-n">${p.rating.toFixed(1)}</span>
+          <span class="review-c">(${p.cnt.toLocaleString()} 則評論)</span>
+        </div>` : ''}
+
+        <div class="r-addr">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          ${esc(p.addr)}
+        </div>
+
+        <div class="r-meta-row">
+          <span class="dist-badge">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+            ${fmtDist(p.dist)}
+          </span>
+          ${p.isOpen !== null ? `
+          <span class="open-badge ${p.isOpen?'open':'shut'}">
+            <span class="open-dot"></span>
+            ${p.isOpen ? '營業中' : '目前休息'}
+          </span>` : ''}
+        </div>
+
+        <div class="r-actions">
+          <a href="${esc(p.mapsUrl)}" target="_blank" rel="noopener" class="btn-map">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            Google Maps 導航
+          </a>
+          ${p.reserveUrl ? `<a href="${esc(p.reserveUrl)}" target="_blank" rel="noopener" class="btn-reserve">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            線上訂位
+          </a>` : ''}
+        </div>
+
+        ${p.sources?.length ? `
+        <div class="sources-wrap">
+          <div class="sources-label">參考來源</div>
+          <div class="src-links">
+            ${p.sources.map(s=>`<a href="${esc(s.url)}" target="_blank" rel="noopener" class="src-link"><span>${s.icon}</span>${esc(s.lbl)}</a>`).join('')}
+          </div>
+        </div>` : ''}
+      </div>
+
+      <div class="r-visual" style="background:${col.bg};color:${col.color}">
+        ${ILLU[illIdx]}
+        ${isDemo ? '<span class="demo-lbl">示範資料</span>' : ''}
+      </div>
+    `;
+    grid.appendChild(el);
+  });
+
+  const band = document.getElementById('resultsBand');
+  band.classList.add('vis');
+  setTimeout(() => band.scrollIntoView({ behavior:'smooth', block:'start' }), 100);
+}
+
+/* ── utils ── */
+function esc(s) {
+  const d = document.createElement('div');
+  d.textContent = s || '';
+  return d.innerHTML;
+}
+function stars(r) {
+  const f = Math.floor(r), h = r-f>=.5;
+  return '★'.repeat(f) + (h?'½':'') + '☆'.repeat(5-f-(h?1:0));
+}
+function fmtDist(m) {
+  if (!m) return '距離未知';
+  return m < 1000 ? `步行約 ${m} 公尺` : `步行約 ${(m/1000).toFixed(1)} 公里`;
+}
+function pause(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+/* ── loading ── */
+function setLoading(on, txt) {
+  document.getElementById('loadingBand').classList.toggle('vis', on);
+  if (txt) document.getElementById('loadTxt').textContent = txt;
+  if (on) document.getElementById('resultsBand').classList.remove('vis');
+}
+function setLoadTxt(t) { document.getElementById('loadTxt').textContent = t; }
+
+/* ── reset ── */
+function resetAll() {
+  document.querySelectorAll('.mood-card').forEach(c => c.classList.remove('sel'));
+  document.querySelectorAll('.tx-tag').forEach(t => t.classList.remove('sel'));
+  ['ingInput','moodFreeInput','txFreeInput'].forEach(id => {
+    const el = document.getElementById(id);
+    el.value = ''; el.classList.remove('has-value');
+  });
+  mood = null; txs = [];
+  document.getElementById('resultsBand').classList.remove('vis');
+  document.getElementById('emptyState').style.display = 'none';
+  document.querySelector('.search-band').scrollIntoView({ behavior:'smooth' });
+}
+
+/* ── api key modal ── */
+function openModal() {
+  document.getElementById('keyInp').value = apiKey;
+  document.getElementById('overlay').classList.add('vis');
+}
+function closeModal() { document.getElementById('overlay').classList.remove('vis'); }
+function saveKey() {
+  const k = document.getElementById('keyInp').value.trim();
+  if (!k) { toast('請輸入 API Key'); return; }
+  apiKey = k;
+  localStorage.setItem('mishi_fsq_key', k);
+  closeModal();
+  toast('✓ Foursquare API Key 已儲存！');
+}
+
+/* ── toast ── */
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('vis');
+  setTimeout(() => el.classList.remove('vis'), 3000);
+}
+</script>
+</body>
+</html>
